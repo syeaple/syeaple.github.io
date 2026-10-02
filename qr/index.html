@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QR Code Generator</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--text:#1d1d1f;--muted:#6b6b70;--accent:#2f5bea;--border:#dcdad4;--err:#c0392b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16161a;--card:#202026;--text:#f0f0f2;--muted:#9a9aa2;--accent:#7a9bff;--border:#34343c;--err:#ff7b6b}}
+:root[data-theme="dark"]{--bg:#16161a;--card:#202026;--text:#f0f0f2;--muted:#9a9aa2;--accent:#7a9bff;--border:#34343c;--err:#ff7b6b}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;justify-content:center;padding:24px 16px}
+main{width:100%;max-width:420px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
+h1{font-size:1.4rem;margin:0 0 4px}
+p.sub{margin:0 0 20px;color:var(--muted);font-size:.95rem}
+input{width:100%;padding:12px 14px;font-size:1rem;border:1px solid var(--border);border-radius:10px;background:var(--bg);color:var(--text)}
+input:focus{outline:2px solid var(--accent);border-color:transparent}
+button{margin-top:12px;width:100%;padding:12px;font-size:1rem;font-weight:600;border:0;border-radius:10px;background:var(--accent);color:#fff;cursor:pointer}
+#shades.logo{aspect-ratio:1;background:#fff;border-radius:12px;padding:2.5%;display:flex;align-items:center;justify-content:center;width:22%}
+#shades.logo img{max-width:100%;max-height:100%;object-fit:contain}
+.logorow{margin-top:14px;font-size:.9rem;color:var(--muted)}
+.logorow input{padding:8px;font-size:.85rem;margin-top:6px}
+#rm{display:none;width:auto;margin:8px 0 0;padding:6px 12px;font-size:.85rem;background:transparent;color:var(--accent);border:1px solid var(--border)}
+#err{color:var(--err);font-size:.9rem;margin:10px 0 0;min-height:1.2em}
+#out{display:none;margin-top:12px;text-align:center}
+#qr{background:#fff;padding:12px;border-radius:12px;display:inline-block;line-height:0;position:relative}
+#shades{position:absolute;left:50%;top:50%;width:26%;height:auto;transform:translate(-50%,-50%);pointer-events:none}
+#qr{width:min(304px,100%)}
+#qr .code{width:100%;height:auto;display:block}
+#label{color:var(--muted);font-size:.85rem;margin-top:10px;word-break:break-all}
+</style>
+</head>
+<body>
+<main>
+  <h1>QR Code Generator</h1>
+  <p class="sub">Enter a URL and get a scannable QR code.</p>
+  <input id="url" type="text" inputmode="url" autocomplete="off" autocapitalize="off" placeholder="https://example.com" aria-label="URL">
+  <div class="logorow">
+    <label for="logo">Logo for the center (optional)</label>
+    <input id="logo" type="file" accept="image/*">
+    <button id="rm" type="button">Remove logo</button>
+  </div>
+  <button id="go">Generate QR code</button>
+  <p id="err" role="alert"></p>
+  <div id="out">
+    <div id="qr"></div>
+    <div id="label"></div>
+  </div>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+(function(){
+  var input=document.getElementById('url'),err=document.getElementById('err'),
+      out=document.getElementById('out'),qr=document.getElementById('qr'),label=document.getElementById('label');
+  var logoData=null;
+  var SHADES='<svg id="shades" viewBox="0 0 120 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
+    '<rect x="1" y="1" width="118" height="62" rx="14" fill="#fff"/>'+
+    '<path d="M10 22 L110 22" stroke="#d94f00" stroke-width="5" stroke-linecap="round"/>'+
+    '<path d="M50 28 Q60 20 70 28" fill="none" stroke="#d94f00" stroke-width="5" stroke-linecap="round"/>'+
+    '<path d="M12 22 H52 V36 Q52 50 38 50 H26 Q12 50 12 36 Z" fill="#ff8a1f" stroke="#d94f00" stroke-width="4" stroke-linejoin="round"/>'+
+    '<path d="M68 22 H108 V36 Q108 50 94 50 H82 Q68 50 68 36 Z" fill="#ff8a1f" stroke="#d94f00" stroke-width="4" stroke-linejoin="round"/>'+
+    '<path d="M20 29 L32 29 M76 29 L88 29" stroke="#fff" stroke-opacity=".6" stroke-width="4" stroke-linecap="round"/>'+
+    '</svg>';
+  // Dots colored along a spiral (hue = angle + distance from center); all colors kept dark for scanning.
+  function swirl(q,label){
+    var n=q.getModuleCount(),m=2,size=n+m*2,c=size/2,s='';
+    function col(x,y){
+      var dx=x-c,dy=y-c,a=Math.atan2(dy,dx)*180/Math.PI,d=Math.sqrt(dx*dx+dy*dy);
+      return 'hsl('+Math.round((a+d*14+360)%360)+',80%,34%)';
+    }
+    function inFinder(r,k){return (r<7&&k<7)||(r<7&&k>=n-7)||(r>=n-7&&k<7);}
+    for(var r=0;r<n;r++)for(var k=0;k<n;k++){
+      if(!q.isDark(r,k)||inFinder(r,k))continue;
+      var x=k+m+.5,y=r+m+.5;
+      s+='<circle cx="'+x+'" cy="'+y+'" r=".47" fill="'+col(x,y)+'"/>';
+    }
+    [[0,0],[0,n-7],[n-7,0]].forEach(function(p){
+      var x=p[1]+m,y=p[0]+m,f=col(x+3.5,y+3.5);
+      s+='<rect x="'+(x+.5)+'" y="'+(y+.5)+'" width="6" height="6" rx="2.4" fill="none" stroke="'+f+'" stroke-width="1"/>'+
+         '<rect x="'+(x+2)+'" y="'+(y+2)+'" width="3" height="3" rx="1.2" fill="'+f+'"/>';
+    });
+    return '<svg class="code" viewBox="0 0 '+size+' '+size+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="QR code for '+label.replace(/[&<>"]/g,'')+'">'+
+      '<rect width="'+size+'" height="'+size+'" fill="#fff"/>'+s+'</svg>';
+  }
+  function generate(){
+    err.textContent='';
+    var v=input.value.trim();
+    if(!v){err.textContent='Please enter a URL.';out.style.display='none';return;}
+    if(!/^[a-z][a-z0-9+.-]*:\/\//i.test(v))v='https://'+v;
+    try{
+      var u=new URL(v);
+      if(u.hostname.indexOf('.')<0&&u.hostname!=='localhost')throw new Error();
+    }catch(e){err.textContent='That doesn\u2019t look like a valid URL.';out.style.display='none';return;}
+    try{
+      var q=qrcode(0,'H');
+      q.addData(v);q.make();
+      qr.innerHTML=swirl(q,v)+(logoData?'<div id="shades" class="logo"><img alt="" src="'+logoData+'"></div>':SHADES);
+      label.textContent=v;
+      out.style.display='block';
+    }catch(e){err.textContent='That URL is too long to encode.';out.style.display='none';}
+  }
+  var logoInput=document.getElementById('logo'),rm=document.getElementById('rm');
+  function refresh(){if(out.style.display==='block')generate();}
+  logoInput.addEventListener('change',function(){
+    var f=logoInput.files&&logoInput.files[0];
+    if(!f)return;
+    if(f.size>2*1024*1024){err.textContent='Please choose an image under 2 MB.';logoInput.value='';return;}
+    var fr=new FileReader();
+    fr.onload=function(){logoData=fr.result;rm.style.display='inline-block';refresh();};
+    fr.readAsDataURL(f);
+  });
+  rm.addEventListener('click',function(){logoData=null;logoInput.value='';rm.style.display='none';refresh();});
+  document.getElementById('go').addEventListener('click',generate);
+  input.addEventListener('keydown',function(e){if(e.key==='Enter')generate();});
+})();
+</script>
+</body>
+</html>
