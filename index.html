@@ -1,1 +1,240 @@
-test
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How I work – Alex Rivera</title>
+<meta name="description" content="A personal site about how Alex Rivera works: principles, daily rhythm, tools, and how to collaborate.">
+<style>
+:root{--bg:#f3f5f7;--surface:#fff;--ink:#14213d;--muted:#4a5568;--line:#d5dbe3;--accent:#2347e6;--hi:#ffd23f;--on-hi:#14213d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1320;--surface:#171e30;--ink:#e8ecf4;--muted:#a9b3c6;--line:#2c3550;--accent:#8fa8ff}}
+:root[data-theme="dark"]{--bg:#0e1320;--surface:#171e30;--ink:#e8ecf4;--muted:#a9b3c6;--line:#2c3550;--accent:#8fa8ff}
+html{scroll-padding-top:env(safe-area-inset-top,0px) + 4rem;scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:1rem/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,h3{font-family:Georgia,"Iowan Old Style",serif;line-height:1.15;margin:0}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:4px}
+.skip{position:absolute;left:-999px;top:0;background:var(--hi);color:var(--on-hi);padding:.6rem 1rem;z-index:10}
+.skip:focus{left:1rem;top:1rem}
+.wrap{max-width:62rem;margin:0 auto;padding:0 clamp(1rem,4vw,2rem)}
+header.top{display:flex;gap:1rem;align-items:center;justify-content:space-between;padding:1rem 0;flex-wrap:wrap}
+nav ul{display:flex;gap:.25rem 1.25rem;list-style:none;margin:0;padding:0;flex-wrap:wrap}
+nav a{color:var(--ink);text-decoration:none;padding:.4rem 0;border-bottom:2px solid transparent}
+nav a:hover{border-color:var(--accent)}
+button{font:inherit;color:inherit;cursor:pointer}
+.theme{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:.4rem .9rem}
+.hero{padding:clamp(3rem,10vw,6.5rem) 0 clamp(2rem,6vw,4rem)}
+.hero h1{font-size:clamp(2.4rem,8vw,5rem);max-width:14ch;letter-spacing:-.02em}
+.hero h1 mark{background:linear-gradient(transparent 58%,var(--hi) 58%);color:inherit;padding:0 .1em}
+.hero p{max-width:40rem;font-size:1.2rem;color:var(--muted);margin:1.5rem 0 0}
+.who{margin-top:1.5rem;font-weight:600}
+section{padding:clamp(2.5rem,7vw,4.5rem) 0;border-top:1px solid var(--line)}
+section>.wrap>h2{font-size:clamp(1.7rem,4vw,2.4rem);margin-bottom:.6rem}
+.lead{color:var(--muted);max-width:40rem;margin:0 0 2rem}
+details{border-bottom:1px solid var(--line);max-width:46rem}
+summary{cursor:pointer;padding:1rem 0;font-family:Georgia,serif;font-size:1.25rem;list-style:none;display:flex;justify-content:space-between;gap:1rem}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--accent);font-size:1.5rem;line-height:1}
+details[open] summary::after{content:"\2212"}
+details p{margin:0 0 1.2rem;color:var(--muted);max-width:40rem}
+.day{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:.4rem;margin:0 0 1.2rem;padding:0;list-style:none}
+.day button{width:100%;min-height:5.5rem;border:1px solid var(--line);border-radius:6px;background:var(--surface);padding:.6rem .4rem;text-align:left;display:flex;flex-direction:column;justify-content:space-between;gap:.4rem;font-size:.85rem}
+.day button b{font-weight:600}
+.day button[data-kind="focus"]{border-top:6px solid var(--accent)}
+.day button[data-kind="people"]{border-top:6px solid var(--hi)}
+.day button[data-kind="admin"]{border-top:6px solid var(--muted)}
+.day button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.detail{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:1.2rem 1.4rem;max-width:46rem;min-height:6.5rem}
+.detail h3{font-size:1.3rem;margin-bottom:.3rem}
+.detail p{margin:0;color:var(--muted)}
+.legend{display:flex;gap:1.2rem;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin:0 0 1rem;padding:0;list-style:none}
+.legend i{display:inline-block;width:.8rem;height:.4rem;margin-right:.4rem;vertical-align:middle}
+@media (max-width:640px){.day{grid-template-columns:1fr 1fr}.day button{min-height:4.5rem}}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:2rem}
+.cols h3{font-size:1.3rem;margin-bottom:.6rem}
+.cols ul{margin:0;padding-left:1.1rem;color:var(--muted)}
+.cols li{margin-bottom:.45rem}
+.tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:1.2rem 2rem;margin:0}
+.tools dt{font-weight:700}
+.tools dd{margin:0;color:var(--muted)}
+.contact a.btn{display:inline-block;background:var(--ink);color:var(--bg);padding:.8rem 1.4rem;border-radius:6px;text-decoration:none;font-weight:600;margin-top:.5rem}
+footer{padding:2rem 0 3rem;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<script>
+/* ============ EDIT YOUR CONTENT HERE ============ */
+const SITE = {
+  name: "Alex Rivera",
+  role: "Product designer and front-end developer",
+  headline: "I do my best work in quiet, clear, finished steps.",
+  intro: "This page explains how I plan, focus, communicate, and ship, so we can work well together from day one.",
+  email: "hello@example.com",
+  principles: [
+    { title: "Start with the problem", text: "I write down who is affected and what success looks like before I open any tool. A clear problem makes every later decision faster." },
+    { title: "Ship small, ship often", text: "I break work into pieces that can be finished and reviewed within a few days. Early feedback is cheaper than late rewrites." },
+    { title: "Write it down", text: "Decisions, open questions, and handoffs live in writing. It keeps everyone aligned across time zones and schedules." },
+    { title: "Protect deep work", text: "I batch meetings and block focus time. Fewer interruptions means better work and fewer mistakes." },
+    { title: "Close the loop", text: "I say what I am doing, do it, and report back. If a deadline will slip, you hear about it early." }
+  ],
+  dayIntro: "Select a block to see what I do and how to reach me during it.",
+  day: [
+    { time: "8:00", label: "Plan", kind: "admin", text: "I review priorities, pick the one thing that matters today, and clear small tasks. I answer urgent messages only." },
+    { time: "9:00", label: "Deep work", kind: "focus", text: "Notifications off. This is when I design, build, and think. Messages wait until noon." },
+    { time: "12:00", label: "Messages", kind: "people", text: "I reply to email and chat in one pass. Good time for quick questions." },
+    { time: "13:00", label: "Break", kind: "admin", text: "Lunch and a walk. I come back sharper." },
+    { time: "14:00", label: "Meetings", kind: "people", text: "Reviews, calls, and pairing sessions. Please send an agenda so we can use the time well." },
+    { time: "16:00", label: "Deep work", kind: "focus", text: "A second focus block for building, polishing, and testing." },
+    { time: "17:30", label: "Wrap up", kind: "admin", text: "I write a short summary of progress and next steps, then log off." }
+  ],
+  withMe: {
+    gives: [
+      "Clear written updates at least once a week",
+      "Honest estimates, including risks",
+      "Quick, specific feedback on your work",
+      "Documentation others can pick up"
+    ],
+    needs: [
+      "A clear goal and a named decision-maker",
+      "Written context before meetings",
+      "Questions in a thread, not in a call",
+      "Room for uninterrupted focus blocks"
+    ]
+  },
+  tools: [
+    { name: "Planning", text: "Plain text notes and a simple weekly list" },
+    { name: "Design", text: "Figma for layouts, pencil and paper for first ideas" },
+    { name: "Building", text: "HTML, CSS, JavaScript, and a code editor" },
+    { name: "Communication", text: "Email for decisions, chat for quick questions" },
+    { name: "Tracking", text: "A shared board with three columns: next, doing, done" },
+    { name: "Reflection", text: "A short Friday review of what worked and what didn't" }
+  ],
+  contactText: "The best way to reach me is email. I reply within one working day, usually around midday."
+};
+const KIND_NAMES = { focus: "Focus time", people: "Time with people", admin: "Planning and breaks" };
+/* ============ END OF EDITABLE CONTENT ============ */
+</script>
+
+<a class="skip" href="#main">Skip to content</a>
+<div class="wrap">
+  <header class="top">
+    <strong id="brand"></strong>
+    <nav aria-label="Main">
+      <ul>
+        <li><a href="#principles">Principles</a></li>
+        <li><a href="#rhythm">Daily rhythm</a></li>
+        <li><a href="#together">Working together</a></li>
+        <li><a href="#tools">Tools</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <button class="theme" id="theme" type="button" aria-label="Switch color theme">Theme</button>
+  </header>
+</div>
+
+<main id="main">
+  <div class="wrap hero">
+    <h1 id="headline"></h1>
+    <p id="intro"></p>
+    <p class="who" id="who"></p>
+  </div>
+
+  <section id="principles" aria-labelledby="h-principles"><div class="wrap">
+    <h2 id="h-principles">Principles</h2>
+    <p class="lead">The habits behind my work. Select a heading to read more.</p>
+    <div id="principleList"></div>
+  </div></section>
+
+  <section id="rhythm" aria-labelledby="h-rhythm"><div class="wrap">
+    <h2 id="h-rhythm">A typical day</h2>
+    <p class="lead" id="dayIntro"></p>
+    <ul class="legend" id="legend" aria-label="Legend"></ul>
+    <ul class="day" id="day"></ul>
+    <div class="detail" id="detail" aria-live="polite"></div>
+  </div></section>
+
+  <section id="together" aria-labelledby="h-together"><div class="wrap">
+    <h2 id="h-together">Working together</h2>
+    <p class="lead">What you can count on, and what helps me do my best work.</p>
+    <div class="cols">
+      <div><h3>What you get from me</h3><ul id="gives"></ul></div>
+      <div><h3>What I need from you</h3><ul id="needs"></ul></div>
+    </div>
+  </div></section>
+
+  <section id="tools" aria-labelledby="h-tools"><div class="wrap">
+    <h2 id="h-tools">Tools and routines</h2>
+    <p class="lead">Simple tools, used consistently.</p>
+    <dl class="tools" id="toolList"></dl>
+  </div></section>
+
+  <section id="contact" class="contact" aria-labelledby="h-contact"><div class="wrap">
+    <h2 id="h-contact">Get in touch</h2>
+    <p class="lead" id="contactText"></p>
+    <a class="btn" id="mail" href="#">Send an email</a>
+  </div></section>
+</main>
+
+<footer><div class="wrap" id="foot"></div></footer>
+
+<script>
+const $ = id => document.getElementById(id);
+function el(tag, props, text){ const e = document.createElement(tag); if(props) Object.assign(e, props); if(text) e.textContent = text; return e; }
+
+document.title = "How I work – " + SITE.name;
+$("brand").textContent = SITE.name;
+$("headline").textContent = SITE.headline;
+$("intro").textContent = SITE.intro;
+$("who").textContent = SITE.name + ", " + SITE.role.toLowerCase();
+$("dayIntro").textContent = SITE.dayIntro;
+$("contactText").textContent = SITE.contactText;
+$("mail").href = "mailto:" + SITE.email;
+$("mail").setAttribute("aria-label", "Send an email to " + SITE.email);
+$("foot").textContent = "\u00A9 " + new Date().getFullYear() + " " + SITE.name + ". This page runs entirely in your browser and collects no data.";
+
+SITE.principles.forEach((p, i) => {
+  const d = el("details"); if(i === 0) d.open = true;
+  d.append(el("summary", null, p.title), el("p", null, p.text));
+  $("principleList").append(d);
+});
+
+Object.keys(KIND_NAMES).forEach(k => {
+  const li = el("li"); const sw = el("i"); sw.style.background = k === "focus" ? "var(--accent)" : k === "people" ? "var(--hi)" : "var(--muted)";
+  sw.setAttribute("aria-hidden", "true"); li.append(sw, KIND_NAMES[k]); $("legend").append(li);
+});
+
+function showBlock(i){
+  const b = SITE.day[i];
+  [...$("day").querySelectorAll("button")].forEach((btn, j) => btn.setAttribute("aria-pressed", String(i === j)));
+  $("detail").replaceChildren(el("h3", null, b.time + " \u2013 " + b.label), el("p", null, b.text));
+}
+SITE.day.forEach((b, i) => {
+  const li = el("li"); const btn = el("button", { type: "button" });
+  btn.dataset.kind = b.kind;
+  btn.setAttribute("aria-pressed", "false");
+  btn.setAttribute("aria-label", b.time + ", " + b.label + ", " + KIND_NAMES[b.kind]);
+  btn.append(el("span", null, b.time), el("b", null, b.label));
+  btn.addEventListener("click", () => showBlock(i));
+  li.append(btn); $("day").append(li);
+});
+$("day").style.gridTemplateColumns = "";
+showBlock(1 < SITE.day.length ? 1 : 0);
+
+SITE.withMe.gives.forEach(t => $("gives").append(el("li", null, t)));
+SITE.withMe.needs.forEach(t => $("needs").append(el("li", null, t)));
+SITE.tools.forEach(t => { const w = el("div"); w.append(el("dt", null, t.name), el("dd", null, t.text)); $("toolList").append(w); });
+
+/* Theme toggle, remembered if storage is available */
+const root = document.documentElement;
+try { const s = localStorage.getItem("theme"); if(s) root.dataset.theme = s; } catch(e){}
+$("theme").addEventListener("click", () => {
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch(e){}
+});
+</script>
+</body>
+</html>
